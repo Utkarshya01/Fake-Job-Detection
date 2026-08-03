@@ -1,0 +1,86 @@
+{
+  "Raw_vs_Cleaned_Text": {
+    "Raw_Text": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": {
+        "true_legitimate_tn": 510,
+        "false_fraudulent_fp": 0,
+        "false_legitimate_fn": 0,
+        "true_fraudulent_tp": 90
+      }
+    },
+    "Cleaned_Text": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": {
+        "true_legitimate_tn": 510,
+        "false_fraudulent_fp": 0,
+        "false_legitimate_fn": 0,
+        "true_fraudulent_tp": 90
+      }
+    }
+  },
+  "TFIDF_vs_CountVectorizer": {
+    "TFIDF_Vectorizer": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": {
+        "true_legitimate_tn": 510,
+        "false_fraudulent_fp": 0,
+        "false_legitimate_fn": 0,
+        "true_fraudulent_tp": 90
+      }
+    },
+    "Count_Vectorizer": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": {
+        "true_legitimate_tn": 510,
+        "false_fraudulent_fp": 0,
+        "false_legitimate_fn": 0,
+        "true_fraudulent_tp": 90
+      }
+    }
+  },
+  "Scaled_vs_Unscaled_Features": {
+    "Scaled_Features": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": {
+        "true_legitimate_tn": 510,
+        "false_fraudulent_fp": 0,
+        "false_legitimate_fn": 0,
+        "true_fraudulent_tp": 90
+      }
+    },
+    "Unscaled_Features": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": {
+        "true_legitimate_tn": 510,
+        "false_fraudulent_fp": 0,
+        "false_legitimate_fn": 0,
+        "true_fraudulent_tp": 90
+      }
+    }
+  }
+}

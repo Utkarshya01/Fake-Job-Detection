@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Job Posting Detection System</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for EDA & Benchmark Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header / Navigation -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-shield-cat"></i>
+                </div>
+                <div>
+                    <h1>Fake Job Posting Detector</h1>
+                    <p class="subtitle">AI & NLP Powered Recruitment Fraud Detection System</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <span class="status-pill status-online">
+                    <span class="pulse-dot"></span> Pipeline Ready
+                </span>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="inspector-tab">
+                <i class="fa-solid fa-magnifying-glass"></i> Job Inspector
+            </button>
+            <button class="tab-btn" data-tab="eda-tab" id="btn-load-eda">
+                <i class="fa-solid fa-chart-pie"></i> EDA & Dataset Analytics
+            </button>
+            <button class="tab-btn" data-tab="models-tab" id="btn-load-models">
+                <i class="fa-solid fa-brain"></i> Model Benchmarks & Ablation
+            </button>
+            <button class="tab-btn" data-tab="batch-tab">
+                <i class="fa-solid fa-file-csv"></i> Batch CSV Scanner
+            </button>
+        </nav>
+
+        <main class="content-area">
+            <!-- TAB 1: JOB INSPECTOR -->
+            <section id="inspector-tab" class="tab-content active">
+                <div class="grid-2col">
+                    <!-- Input Form Card -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h2><i class="fa-solid fa-pen-to-square"></i> Job Posting Details</h2>
+                            <div class="preset-buttons">
+                                <button type="button" class="btn-preset btn-fake" id="load-fake-preset">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Sample Scam
+                                </button>
+                                <button type="button" class="btn-preset btn-real" id="load-real-preset">
+                                    <i class="fa-solid fa-circle-check"></i> Sample Real Job
+                                </button>
+                            </div>
+                        </div>
+
+                        <form id="prediction-form" class="job-form">
+                            <div class="form-group">
+                                <label for="job-title">Job Title <span class="req">*</span></label>
+                                <input type="text" id="job-title"
+                                    placeholder="e.g. Data Entry Specialist / Software Engineer" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="company-profile">Company Profile</label>
+                                <textarea id="company-profile" rows="3"
+                                    placeholder="Overview of company history, mission, and background..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="job-description">Job Description <span class="req">*</span></label>
+                                <textarea id="job-description" rows="4"
+                                    placeholder="Detailed responsibilities, daily duties, team role..."
+                                    required></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="job-requirements">Requirements</label>
+                                    <textarea id="job-requirements" rows="3"
+                                        placeholder="Education, years of experience, technical skills..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="job-benefits">Benefits & Compensation</label>
+                                    <textarea id="job-benefits" rows="3"
+                                        placeholder="Health insurance, 401k, remote stipend..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="salary-range">Salary Range</label>
+                                <input type="text" id="salary-range" placeholder="e.g. 60000-85000 or $5000/week">
+                            </div>
+
+                            <!-- Structured Binary Toggles -->
+                            <div class="toggle-group">
+                                <label class="toggle-control">
+                                    <input type="checkbox" id="telecommuting">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label"><i class="fa-solid fa-house-laptop"></i> Remote /
+                                        Telecommuting</span>
+                                </label>
+
+                                <label class="toggle-control">
+                                    <input type="checkbox" id="has-company-logo" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label"><i class="fa-solid fa-image"></i> Company Logo
+                                        Included</span>
+                                </label>
+
+                                <label class="toggle-control">
+                                    <input type="checkbox" id="has-questions" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label"><i class="fa-solid fa-clipboard-question"></i> Screening
+                                        Questions</span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn-primary" id="btn-predict">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Job Posting
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Output / Result Card -->
+                    <div class="glass-card result-card">
+                        <div class="card-header">
+                            <h2><i class="fa-solid fa-chart-line"></i> Detection Assessment</h2>
+                        </div>
+
+                        <div id="result-placeholder" class="result-state">
+                            <div class="placeholder-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <h3>Awaiting Analysis</h3>
+                            <p>Fill in the job details on the left or load a sample preset to evaluate fraud risk.</p>
+                        </div>
+
+                        <div id="result-content" class="result-state hidden">
+                            <!-- Risk Gauge -->
+                            <div class="gauge-container">
+                                <div class="gauge-ring" id="gauge-ring">
+                                    <div class="gauge-inner">
+                                        <span class="gauge-value" id="risk-score-val">0%</span>
+                                        <span class="gauge-label">FRAUD PROBABILITY</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Prediction Status Badge -->
+                            <div class="status-box" id="status-box">
+                                <div class="status-badge" id="status-badge">LEGITIMATE</div>
+                                <span class="risk-level-tag" id="risk-level-tag">LOW RISK</span>
+                            </div>
+
+                            <!-- Flagged Suspicious Triggers -->
+                            <div class="triggers-container">
+                                <h4><i class="fa-solid fa-bug"></i> Flagged Suspicious Keywords</h4>
+                                <div class="triggers-list" id="triggers-list">
+                                    <!-- Dynamic badges -->
+                                </div>
+                            </div>
+
+                            <!-- Decision Explanation & Risk Factors -->
+                            <div class="risk-factors-container">
+                                <h4><i class="fa-solid fa-list-check"></i> Model Decision Explanation</h4>
+                                <ul class="factors-list" id="factors-list">
+                                    <!-- Dynamic items -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: DATASET & EDA -->
+            <section id="eda-tab" class="tab-content">
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <i class="fa-solid fa-database stat-icon"></i>
+                        <div>
+                            <span class="stat-num" id="eda-total-postings">0</span>
+                            <span class="stat-desc">Total Dataset Records</span>
+                        </div>
+                    </div>
+                    <div class="stat-card border-danger">
+                        <i class="fa-solid fa-triangle-exclamation stat-icon danger"></i>
+                        <div>
+                            <span class="stat-num danger" id="eda-fraud-percent">0%</span>
+                            <span class="stat-desc">Fraudulent Job Ratio</span>
+                        </div>
+                    </div>
+                    <div class="stat-card border-success">
+                        <i class="fa-solid fa-circle-check stat-icon success"></i>
+                        <div>
+                            <span class="stat-num success" id="eda-real-count">0</span>
+                            <span class="stat-desc">Legitimate Job Postings</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2col chart-grid">
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-chart-pie"></i> Target Class Distribution</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-class-dist"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-chart-column"></i> Missing Metadata Analysis</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-missing-meta"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card mt-4">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-industry"></i> Top Fraudulent Industries</h3>
+                    </div>
+                    <div class="chart-wrapper-horiz">
+                        <canvas id="chart-fraud-industries"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MODEL BENCHMARKS -->
+            <section id="models-tab" class="tab-content">
+                <div class="glass-card mb-4">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-trophy"></i> Multi-Model Classification Benchmarks</h2>
+                        <p class="subtitle">Comparing performance metrics across algorithms on stratified test partition
+                        </p>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Accuracy</th>
+                                    <th>Precision</th>
+                                    <th>Recall (Fraud)</th>
+                                    <th>F1-Score</th>
+                                    <th>ROC-AUC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="models-table-body">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading model benchmarks...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid-2col">
+                    <!-- Preprocessing Ablation Experiments -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-flask"></i> Preprocessing & Vectorization Impact</h3>
+                        </div>
+                        <div id="ablation-experiments-container">
+                            <p class="text-muted">Loading experiment results...</p>
+                        </div>
+                    </div>
+
+                    <!-- Top Feature Indicators -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-key"></i> Key Predictive Words & Indicators</h3>
+                        </div>
+                        <div class="indicators-grid">
+                            <div class="indicator-col danger">
+                                <h4><i class="fa-solid fa-skull"></i> Top Fraud Indicators</h4>
+                                <ul id="list-fraud-indicators" class="indicator-tags danger">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                            <div class="indicator-col success">
+                                <h4><i class="fa-solid fa-shield-heart"></i> Top Legitimate Indicators</h4>
+                                <ul id="list-real-indicators" class="indicator-tags success">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: BATCH CSV SCANNER -->
+            <section id="batch-tab" class="tab-content">
+                <div class="glass-card mb-4">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-cloud-arrow-up"></i> Batch Job Postings Audit</h2>
+                        <p class="subtitle">Upload a CSV dataset of job postings to perform automated bulk fraud
+                            classification.</p>
+                    </div>
+
+                    <form id="batch-upload-form" class="upload-dropzone">
+                        <input type="file" id="batch-csv-input" accept=".csv" class="file-input-hidden" required>
+                        <label for="batch-csv-input" class="dropzone-label">
+                            <i class="fa-solid fa-file-csv dropzone-icon"></i>
+                            <span class="dropzone-text">Click to select CSV file or drag and drop</span>
+                            <span class="dropzone-sub" id="file-name-display">Expected columns: title, company_profile,
+                                description, etc.</span>
+                        </label>
+                        <button type="submit" class="btn-primary mt-3" id="btn-process-batch">
+                            <i class="fa-solid fa-gears"></i> Process Batch CSV
+                        </button>
+                    </form>
+                </div>
+
+                <div id="batch-results-card" class="glass-card hidden">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-square-poll-vertical"></i> Batch Summary Results</h3>
+                    </div>
+
+                    <div class="stats-row mb-3">
+                        <div class="stat-card">
+                            <span class="stat-num" id="batch-total-scanned">0</span>
+                            <span class="stat-desc">Postings Scanned</span>
+                        </div>
+                        <div class="stat-card border-danger">
+                            <span class="stat-num danger" id="batch-flagged-count">0</span>
+                            <span class="stat-desc">Flagged Fraudulent</span>
+                        </div>
+                        <div class="stat-card border-danger">
+                            <span class="stat-num danger" id="batch-fraud-rate">0%</span>
+                            <span class="stat-desc">Flagged Fraud Rate</span>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Job Title</th>
+                                    <th>Prediction Status</th>
+                                    <th>Fraud Probability</th>
+                                    <th>Risk Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batch-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
