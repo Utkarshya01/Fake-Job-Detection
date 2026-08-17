@@ -89,3 +89,8 @@ tempCodeRunnerFile.py
 # OS files
 .DS_Store
 Thumbs.db
+
+# Jupyter / Colab Notebooks
+*.ipynb
+Fake_Job_Posting_Detection_Colab.ipynb
+
