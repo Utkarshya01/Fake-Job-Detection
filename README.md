@@ -7,6 +7,7 @@
 ![NLP](https://img.shields.io/badge/NLP-TF--IDF-green?style=for-the-badge)
 ![Gradio](https://img.shields.io/badge/Gradio-Interactive-red?style=for-the-badge)
 
+Live Project - https://fake-job-detection-uou9.onrender.com
 ---
 
 ## 📌 Project Overview
